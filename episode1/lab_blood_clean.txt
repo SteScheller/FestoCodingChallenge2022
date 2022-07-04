@@ -1,0 +1,352 @@
+1.
+  +--------+
+  |i pcpooo|
+  | oipopoo|
+  | p oc i |
+  |pcppp  p|
+  |o io p i|
+  |oo ici i|
+  +--------+
+
+
+2.
+  +--------+
+  |ocpo  pi|
+  |  cp c  |
+  | o  icc |
+  |o o poi |
+  |oo ic   |
+  | cpo  pi|
+  +--------+
+
+
+3.
+  +--------+
+  | i oococ|
+  |p    co |
+  |pi i  ip|
+  | cp pppo|
+  |pcicp ic|
+  |cpiic i |
+  +--------+
+
+
+4.
+  +--------+
+  |c  co co|
+  |oppcocoi|
+  |cpc  i o|
+  |pipoip i|
+  |o   o i |
+  |  oi  po|
+  +--------+
+
+
+5.
+  +--------+
+  |  c  op |
+  |ciipcppc|
+  |c io cip|
+  | p i oi |
+  |  poicpi|
+  |  o iop |
+  +--------+
+
+
+6.
+  +--------+
+  |oc opc o|
+  |cpiic ic|
+  |oic po c|
+  |  o ip p|
+  |piii icc|
+  |  ccccpc|
+  +--------+
+
+
+7.
+  +--------+
+  |i  oi  p|
+  |cpopoiic|
+  |p  op  i|
+  | pccc  p|
+  |ocppcp  |
+  |ppoppii |
+  +--------+
+
+
+8.
+  +--------+
+  |oipoi ii|
+  | poo c c|
+  | ocpi cp|
+  |ppc  coo|
+  |coppc op|
+  |ci   o c|
+  +--------+
+
+
+9.
+  +--------+
+  |ci iciic|
+  |pcpop   |
+  |ciocpcic|
+  | cicp   |
+  | piipiop|
+  |c p pp p|
+  +--------+
+
+
+10.
+  +--------+
+  |ccooip c|
+  |p  iiiic|
+  |cp   cii|
+  |i  pc   |
+  |  iico i|
+  |p  icp o|
+  +--------+
+
+
+11.
+  +--------+
+  |co oi oc|
+  |    c ip|
+  |p  ci ic|
+  |c c ci  |
+  | o pp   |
+  |oiicoi  |
+  +--------+
+
+
+12.
+  +--------+
+  |po o  co|
+  | i  p pc|
+  | pc pi  |
+  |  poiooo|
+  |icoi oip|
+  |o  op cc|
+  +--------+
+
+
+13.
+  +--------+
+  |io  pi o|
+  | pp  ici|
+  |ici icc |
+  |c oi coo|
+  |pi oicpp|
+  |p  p c  |
+  +--------+
+
+
+14.
+  +--------+
+  | ip c co|
+  |  c cppo|
+  | occ oc |
+  |  op ooi|
+  | pc     |
+  | io  o  |
+  +--------+
+
+
+15.
+  +--------+
+  |ciocoio |
+  |pc p  op|
+  |cp opi  |
+  |i po  c |
+  |ci iiccp|
+  |p   co  |
+  +--------+
+
+
+16.
+  +--------+
+  | pic    |
+  |cc  io o|
+  |ioc c ic|
+  |  i p oc|
+  |oicip  i|
+  | o  i co|
+  +--------+
+
+
+17.
+  +--------+
+  |cpp p ip|
+  |cpopipo |
+  |i c i oo|
+  |c cc  ii|
+  |p  ico  |
+  |   pc o |
+  +--------+
+
+
+18.
+  +--------+
+  |i  o p c|
+  |   pcipi|
+  |piopp p |
+  |o cpcpi |
+  |po io op|
+  |  cpccpc|
+  +--------+
+
+
+19.
+  +--------+
+  |i ppc  c|
+  |occccc  |
+  |  p pic |
+  |cc pocoo|
+  |c op pip|
+  | o ci   |
+  +--------+
+
+
+20.
+  +--------+
+  |cc coco |
+  |c  ipic |
+  |i ipio  |
+  |pp  c pi|
+  |cp    pp|
+  |i i op c|
+  +--------+
+
+
+21.
+  +--------+
+  |o cii oi|
+  |oo c io |
+  |pcoip  o|
+  | opo    |
+  |opcopic |
+  |  p pc  |
+  +--------+
+
+
+22.
+  +--------+
+  |c    c o|
+  |  o   co|
+  |ci o i i|
+  |c po   p|
+  |cooc  pp|
+  |ppococc |
+  +--------+
+
+
+23.
+  +--------+
+  |o  ippo |
+  |p i ocp |
+  |p   o  p|
+  |c cio pi|
+  |  pop oc|
+  |  oop op|
+  +--------+
+
+
+24.
+  +--------+
+  |io  ii c|
+  |o  co  i|
+  | copp  c|
+  | cp  ocp|
+  |i cc ioi|
+  |icio   p|
+  +--------+
+
+
+25.
+  +--------+
+  |   iocco|
+  | ccoioc |
+  |oici i  |
+  | o ip c |
+  | i ic oo|
+  |cpii cip|
+  +--------+
+
+
+26.
+  +--------+
+  |   p i p|
+  |i i   co|
+  |cppc ip |
+  |ic  cc  |
+  | oppccip|
+  |ci  pcpp|
+  +--------+
+
+
+27.
+  +--------+
+  | pccic p|
+  |cppioc  |
+  | ip ccp |
+  |cpc  i c|
+  |op     o|
+  | o oci c|
+  +--------+
+
+
+28.
+  +--------+
+  | ip  pii|
+  |ioc pc c|
+  | coio p |
+  |cp  c   |
+  |   p co |
+  |iip i io|
+  +--------+
+
+
+29.
+  +--------+
+  |ccciiooo|
+  |p icc   |
+  | p p io |
+  | popo  o|
+  |ccoo opp|
+  |op   ppp|
+  +--------+
+
+
+30.
+  +--------+
+  |pp pioo |
+  | cii pcp|
+  |oo   i  |
+  |op ioi i|
+  |c ip  ii|
+  |o p ioip|
+  +--------+
+
+
+31.
+  +--------+
+  |  i     |
+  | pioop  |
+  |pop p op|
+  | ippcoc |
+  |oi i  c |
+  | o o i o|
+  +--------+
+
+
+32.
+  +--------+
+  | oioccic|
+  | ci  p c|
+  |ciccccoc|
+  | opiicii|
+  |p   i o |
+  |i i oo i|
+  +--------+
+
+
