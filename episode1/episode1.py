@@ -173,15 +173,48 @@ def read_security_log(file_path: str) -> List[SecurityEntries]:
     return entries
 
 
+@dataclass
+class VisitEntry:
+    time: str
+    place: str
+    goes_in: bool
+
+
 def build_list_of_visited_places(
     people: List[PopulationEntry], log: List[SecurityEntries]
-) -> Dict[str, List[str]]:
+) -> Dict[str, List[VisitEntry]]:
     visits = dict()
+
+    def time_key(item: VisitEntry) -> int:
+        return int("".join(item.time.split(":")))
 
     for p in people:
         name = p.username
+        visited = list()
+        for entry in log:
+            for time, (in_list, out_list) in entry.events.items():
+                if name in in_list:
+                    visited.append(VisitEntry(time=time, place=entry.place, goes_in=True))
+                if name in out_list:
+                    visited.append(VisitEntry(time=time, place=entry.place, goes_in=False))
+        visited.sort(key=time_key)
+        visits[p] = visited
 
     return visits
+
+
+def filter_visits(
+    people_visits: Dict[PopulationEntry, List[VisitEntry]], sequence: List[str]
+) -> List[PopulationEntry]:
+    filtered = list()
+
+    pattern = "|".join(sequence)
+    for person, visits in people_visits.items():
+        visits = visits[::2]
+        if pattern in "|".join([x.place for x in visits]):
+            filtered.append(person)
+
+    return filtered
 
 
 if __name__ == "__main__":
@@ -210,7 +243,12 @@ if __name__ == "__main__":
     # puzzle 3
     log = read_security_log("./security_log.txt")
     people_visits = build_list_of_visited_places(population, log)
-    print(people_visits)
+    filtered = filter_visits(
+        people_visits, ["Junkyard", "Pod Racing Track", "Pod Racing Track", "Palace", "Factory"]
+    )
+    sum_ids = reduce(lambda x, y: x + y.user_id, filtered, 0)
+    print(f"Solution for puzzle 3: {sum_ids}")
+    filtered_suspects.append(filtered)
 
     # list of suspects
     suspects = set(filtered_suspects[0])
