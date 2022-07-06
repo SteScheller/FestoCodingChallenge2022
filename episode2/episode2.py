@@ -1,40 +1,59 @@
 from pathlib import Path
-from typing import List
+from typing import List, Tuple, Set
 from functools import reduce
+from itertools import product
 
 from episode1.episode1 import PopulationEntry, read_population, read_lab
 
 
 def filter_pico_gen2(entries: List[PopulationEntry]) -> List[PopulationEntry]:
+    SEQUENCE = "picoico"
+
+    def get_neighborhood(size: Tuple[int, int], row: int, col: int) -> Set[Tuple[int, int]]:
+        """get coodinates of neighboring blood cells in horizontal and vertical direction"""
+        coords = set()
+        if row > 0:
+            coords.add((row - 1, col))
+        if row < (size[0] - 1):
+            coords.add((row + 1, col))
+        if col > 0:
+            coords.add((row, col - 1))
+        if col < (size[1] - 1):
+            coords.add((row, col + 1))
+
+        return coords
+
+    def bend_sequence_dfs(
+        sample: List[List[str]],
+        size: Tuple[int, int],
+        sequence: str,
+        sequence_index: int,
+        row: int,
+        col: int,
+    ) -> bool:
+        """Depth first search for bend sequence of characters in two dimensional array"""
+        if sequence_index == len(sequence):
+            return True
+
+        if sequence_index == 0:
+            neighborhood = {(row, col)}
+        else:
+            neighborhood = get_neighborhood(size, row, col)
+        for (n_row, n_col) in neighborhood:
+            if sample[n_row][n_col] == sequence[sequence_index]:
+                if bend_sequence_dfs(sample, size, sequence, sequence_index + 1, n_row, n_col):
+                    return True
+
+        return False
+
     filtered = list()
-
-    for item in entries:
-        sample = item.blood_sample
-        has_picobots = ("picoico" in sample) or ("ociocip" in sample)
-        """
-        for i in range(8):
-            if has_picobots:
+    for p in entries:
+        sample = p.blood_sample.splitlines()
+        size = (len(sample), len(sample[0]))
+        for row, col in product(range(size[0]), range(size[1])):
+            if bend_sequence_dfs(sample, size, SEQUENCE, 0, row, col):
+                filtered.append(p)
                 break
-            pattern = (
-                rf"\|{i*'.'}p{(7-i)*'.'}\|\s+"
-                rf"\|{i*'.'}i{(7-i)*'.'}\|\s+"
-                rf"\|{i*'.'}c{(7-i)*'.'}\|\s+"
-                rf"\|{i*'.'}o{(7-i)*'.'}\|"
-            )
-            if re.search(pattern, sample) is not None:
-                has_picobots = True
-                break
-            pattern = (
-                rf"\|{i*'.'}o{(7-i)*'.'}\|\s+"
-                rf"\|{i*'.'}c{(7-i)*'.'}\|\s+"
-                rf"\|{i*'.'}i{(7-i)*'.'}\|\s+"
-                rf"\|{i*'.'}p{(7-i)*'.'}\|"
-            )
-            has_picobots |= re.search(pattern, sample) is not None
-        """
-
-        if has_picobots:
-            filtered.append(item)
 
     return filtered
 
