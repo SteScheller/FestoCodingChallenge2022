@@ -31,12 +31,10 @@ def read_population(file_path: Path) -> List[PopulationEntry]:
         r"Blood Sample:\s+\+--------\+\n([pico\s\|]+)\+--------\+"
     )
     for match in re.findall(pattern, content):
+        sample = "\n".join([x.strip()[1:-1] for x in match[3].split("\n")])
         entries.append(
             PopulationEntry(
-                username=match[0],
-                user_id=int(match[1]),
-                home_planet=match[2],
-                blood_sample=match[3],
+                username=match[0], user_id=int(match[1]), home_planet=match[2], blood_sample=sample
             )
         )
 
@@ -50,9 +48,10 @@ def read_lab(file_path: Path) -> List[PopulationEntry]:
     entries = list()
     pattern = r"\+--------\+\n([pico\s\|]+)\+--------\+"
     for match in re.findall(pattern, content):
+        sample = "\n".join([x.strip()[1:-1] for x in match.split("\n")])
         entries.append(
             PopulationEntry(
-                username="John Doe", user_id=42, home_planet="Earth", blood_sample=match
+                username="John Doe", user_id=42, home_planet="Earth", blood_sample=sample
             )
         )
 
@@ -69,19 +68,19 @@ def filter_pico(entries: List[PopulationEntry]) -> List[PopulationEntry]:
             if has_picobots:
                 break
             pattern = (
-                rf"\|{i*'.'}p{(7-i)*'.'}\|\s+"
-                rf"\|{i*'.'}i{(7-i)*'.'}\|\s+"
-                rf"\|{i*'.'}c{(7-i)*'.'}\|\s+"
-                rf"\|{i*'.'}o{(7-i)*'.'}\|"
+                rf"{i*'.'}p{(7-i)*'.'}\s+"
+                rf"{i*'.'}i{(7-i)*'.'}\s+"
+                rf"{i*'.'}c{(7-i)*'.'}\s+"
+                rf"{i*'.'}o{(7-i)*'.'}"
             )
             if re.search(pattern, sample) is not None:
                 has_picobots = True
                 break
             pattern = (
-                rf"\|{i*'.'}o{(7-i)*'.'}\|\s+"
-                rf"\|{i*'.'}c{(7-i)*'.'}\|\s+"
-                rf"\|{i*'.'}i{(7-i)*'.'}\|\s+"
-                rf"\|{i*'.'}p{(7-i)*'.'}\|"
+                rf"{i*'.'}o{(7-i)*'.'}\s+"
+                rf"{i*'.'}c{(7-i)*'.'}\s+"
+                rf"{i*'.'}i{(7-i)*'.'}\s+"
+                rf"{i*'.'}p{(7-i)*'.'}"
             )
             has_picobots |= re.search(pattern, sample) is not None
 
