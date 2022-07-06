@@ -2,6 +2,7 @@ import re
 from dataclasses import dataclass
 from typing import List, Dict, Tuple
 from functools import reduce
+from pathlib import Path
 
 import numpy as np
 
@@ -18,7 +19,7 @@ class PopulationEntry:
         return hash(self.username + str(self.user_id) + self.home_planet + self.blood_sample)
 
 
-def read_population(file_path: str) -> List[PopulationEntry]:
+def read_population(file_path: Path) -> List[PopulationEntry]:
     with open(file_path) as f:
         content = f.read()
 
@@ -42,7 +43,7 @@ def read_population(file_path: str) -> List[PopulationEntry]:
     return entries
 
 
-def read_lab(file_path: str) -> List[PopulationEntry]:
+def read_lab(file_path: Path) -> List[PopulationEntry]:
     with open(file_path) as f:
         content = f.read()
 
@@ -101,7 +102,7 @@ class GalaxyEntry:
         return hash(self.planet + str(self.coordinates))
 
 
-def read_galaxy(file_path: str) -> List[GalaxyEntry]:
+def read_galaxy(file_path: Path) -> List[GalaxyEntry]:
     with open(file_path) as f:
         content = f.read()
 
@@ -152,7 +153,7 @@ class SecurityEntries:
         return hash(self.planet + str(self.coordinates))
 
 
-def read_security_log(file_path: str) -> List[SecurityEntries]:
+def read_security_log(file_path: Path) -> List[SecurityEntries]:
     with open(file_path) as f:
         content = f.read()
 
@@ -218,21 +219,23 @@ def filter_visits(
 
 
 if __name__ == "__main__":
-
+    base_path = Path(__file__).parent
     filtered_suspects = list()
 
     # puzzle 1
-    print(f"Bots found in clean samples: {len(filter_pico(read_lab('./lab_blood_clean.txt')))}")
-    print(f"Bots found in gen1 samples: {len(filter_pico(read_lab('./lab_blood_gen1.txt')))}")
+    filtered = filter_pico(read_lab(base_path / "lab_blood_clean.txt"))
+    print(f"Bots found in clean samples: {len(filtered)}")
+    filtered = filter_pico(read_lab(base_path / "lab_blood_gen1.txt"))
+    print(f"Bots found in gen1 samples: {len(filtered)}")
 
-    population = read_population("./population.txt")
+    population = read_population(base_path / "population.txt")
     filtered = filter_pico(population)
     sum_ids = reduce(lambda x, y: x + y.user_id, filtered, 0)
     print(f"Solution for puzzle 1: {sum_ids}")
     filtered_suspects.append(filtered)
 
     # puzzle 2
-    galaxy = read_galaxy("./galaxy_map.txt")
+    galaxy = read_galaxy(base_path / "galaxy_map.txt")
     plane = fit_galaxy_plane(galaxy)
     planets = [x.planet for x in filter_outlier_planets(galaxy, plane, 10)]
     people = [x for x in population if (x.home_planet in planets)]
@@ -241,7 +244,7 @@ if __name__ == "__main__":
     filtered_suspects.append(people)
 
     # puzzle 3
-    log = read_security_log("./security_log.txt")
+    log = read_security_log(base_path / "security_log.txt")
     people_visits = build_list_of_visited_places(population, log)
     filtered = filter_visits(
         people_visits, ["Junkyard", "Pod Racing Track", "Pod Racing Track", "Palace", "Factory"]
