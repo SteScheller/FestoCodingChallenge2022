@@ -1,9 +1,13 @@
+import math
 from pathlib import Path
 from typing import List, Tuple, Set
 from functools import reduce
 from itertools import product
 
+import numpy as np
+
 from episode1.episode1 import PopulationEntry, read_population, read_lab
+from episode1.episode1 import GalaxyEntry, read_galaxy
 
 
 def filter_pico_gen2(entries: List[PopulationEntry]) -> List[PopulationEntry]:
@@ -58,6 +62,27 @@ def filter_pico_gen2(entries: List[PopulationEntry]) -> List[PopulationEntry]:
     return filtered
 
 
+# --------------------------------------------------------------------------------------------------
+def compute_min_distance_point_to_line_segment(
+    point: np.ndarray, line: Tuple[np.ndarray, np.ndarray]
+) -> float:
+    vl0p = point - line[0]
+    vl1p = point - line[1]
+    vl0l1 = line[1] - line[0]
+    dl0p = np.linalg.norm(vl0p)
+    dl1p = np.linalg.norm(vl1p)
+
+    # Test if the base point of the normal is on the trade route
+    if (np.dot(vl0p, vl0l1) > 0) and (np.dot(vl1p, -vl0l1) > 0):
+        dlp = math.sqrt(
+            dl0p**2 - (np.dot(vl0p / dl0p, vl0l1 / np.linalg.norm(vl0l1)) * dl0p) ** 2
+        )
+    else:
+        dlp = math.inf
+
+    return min(dl0p, dl1p, dlp)
+
+
 if __name__ == "__main__":
     base_path = Path(__file__).parent
     filtered_suspects = list()
@@ -75,6 +100,7 @@ if __name__ == "__main__":
     filtered_suspects.append(filtered)
 
     # puzzle 2
+    galaxy = read_galaxy("episode1/galaxy_map.txt")
 
     # puzzle 3
 
