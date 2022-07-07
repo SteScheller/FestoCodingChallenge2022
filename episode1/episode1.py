@@ -90,7 +90,7 @@ def filter_pico(entries: List[PopulationEntry]) -> List[PopulationEntry]:
     return filtered
 
 
-# ---------------------------------------------------------------------------------------------------
+# --------------------------------------------------------------------------------------------------
 @dataclass
 class GalaxyEntry:
     "Class for galaxy_map.txt entries"
@@ -141,7 +141,7 @@ def filter_outlier_planets(
     return filtered
 
 
-# ---------------------------------------------------------------------------------------------------
+# --------------------------------------------------------------------------------------------------
 @dataclass
 class SecurityEntries:
     "Class for security_log.txt entries"
