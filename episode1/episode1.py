@@ -182,7 +182,7 @@ class VisitEntry:
 
 def build_list_of_visited_places(
     people: List[PopulationEntry], log: List[SecurityEntries]
-) -> Dict[str, List[VisitEntry]]:
+) -> Dict[PopulationEntry, List[VisitEntry]]:
     visits = dict()
 
     def time_key(item: VisitEntry) -> int:
