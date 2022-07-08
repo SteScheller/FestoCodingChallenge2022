@@ -1,6 +1,6 @@
 import math
 from pathlib import Path
-from typing import List, Tuple, Set
+from typing import List, Tuple, Set, Dict
 from functools import reduce
 from itertools import product
 
@@ -83,6 +83,31 @@ def compute_min_distance_point_to_line_segment(
     return min(dl0p, dl1p, dlp)
 
 
+def filter_traderoutes(
+    galaxy: List[GalaxyEntry],
+    population: List[PopulationEntry],
+    routes: Dict[Tuple[str, str], bool],
+) -> List[PopulationEntry]:
+    filtered = list()
+
+    planets = dict()
+    for entry in galaxy:
+        planets[entry.planet] = entry.coordinates
+
+    for person in population:
+        person_routes = dict()
+        planet_coords = planets[person.home_planet]
+        for route in routes:
+            line_segment = (planets[route[0]], planets[route[1]])
+            person_routes[route] = 10 >= compute_min_distance_point_to_line_segment(
+                planet_coords, line_segment
+            )
+        if person_routes == routes:
+            filtered.append(person)
+
+    return filtered
+
+
 if __name__ == "__main__":
     base_path = Path(__file__).parent
     filtered_suspects = list()
@@ -101,6 +126,22 @@ if __name__ == "__main__":
 
     # puzzle 2
     galaxy = read_galaxy("episode1/galaxy_map.txt")
+    filtered = filter_traderoutes(
+        galaxy,
+        population,
+        {
+            ("Scurus V", "Tauries VII"): True,
+            ("Saturus", "Beta Geminus"): False,
+            ("Corpeia V", "Menta"): False,
+            ("Grux", "Alpha Beron"): False,
+            ("Gamma Veni", "Beta Earos"): False,
+            ("Alpha Sexta", "Alpha Caprida"): False,
+            ("Beta Drado VI", "Uranis"): True,
+        },
+    )
+    sum_ids = reduce(lambda x, y: x + y.user_id, filtered, 0)
+    print(f"Solution for puzzle 2: {sum_ids}")
+    filtered_suspects.append(filtered)
 
     # puzzle 3
 
