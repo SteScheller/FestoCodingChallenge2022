@@ -160,16 +160,18 @@ def read_security_log(file_path: Path) -> List[SecurityEntries]:
     entries = list()
     for item in places:
         lines = item.splitlines()
+        place = lines[0].strip()
+        in_outs = "\n".join(lines[1:])
         events = dict()
         for match in re.findall(
-            (r"(\d{2}:\d{2})\s+" r"(?:in:\s*([,\w ]+)\s+)?" r"(?:out:\s*([,\w ]+))?$"),
-            "\n".join(lines[1:]),
+            r"(\d{2}:\d{2})\s+(?:in:\s*([,\w ]+)\s+)?(?:out:\s*([,\w ]+))?$",
+            in_outs,
             re.MULTILINE,
         ):
             in_list = [x.strip() for x in match[1].split(",") if match[1]]
             out_list = [x.strip() for x in match[2].split(",") if match[2]]
             events[match[0]] = in_list, out_list
-        entries.append(SecurityEntries(place=lines[0].strip(), events=events))
+        entries.append(SecurityEntries(place=place, events=events))
     return entries
 
 
