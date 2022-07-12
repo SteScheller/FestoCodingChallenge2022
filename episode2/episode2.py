@@ -1,16 +1,14 @@
 import math
+import re
 from pathlib import Path
 from typing import List, Tuple, Set, Dict
 from functools import reduce
 from itertools import product, combinations
-import pickle
 
 import numpy as np
 
 from episode1.episode1 import PopulationEntry, read_population, read_lab
 from episode1.episode1 import GalaxyEntry, read_galaxy
-from episode1.episode1 import SecurityEntries, read_security_log
-from episode1.episode1 import VisitEntry, build_list_of_visited_places
 
 
 def filter_pico_gen2(entries: List[PopulationEntry]) -> List[PopulationEntry]:
@@ -112,60 +110,61 @@ def filter_traderoutes(
 
 
 # --------------------------------------------------------------------------------------------------
-def compute_times(visits: List[VisitEntry]) -> List[int]:
+def compute_times(visits: List[str]) -> List[int]:
     times = list()
 
     def minute_difference(t_in: str, t_out: str) -> int:
         h_in, m_in = [int(x) for x in t_in.split(":")]
         h_out, m_out = [int(x) for x in t_out.split(":")]
-
-        dh = 60 * (h_out - h_in)
-        dm = m_out - m_in
-        if dm < 0:
-            dm += 60
-
-        assert dh >= 0
-        assert dm < 60
-        assert dm >= 0
-
-        return dh + dm
+        return (h_out * 60 + m_out) - (h_in * 60 + m_in)
 
     for idx in range(0, len(visits), 2):
-        assert visits[idx].goes_in is True
-        assert visits[idx + 1].goes_in is False
-        assert visits[idx + 1].place == visits[idx].place
-        times.append(minute_difference(visits[idx].time, visits[idx + 1].time))
+        times.append(minute_difference(visits[idx], visits[idx + 1]))
 
     return times
 
 
-def filter_payment(population: List[PopulationEntry], log: List[SecurityEntries]):
+def get_in_out_times(log_path: str) -> Dict[str, List[int]]:
+    with open(log_path, "r") as f:
+        log = f.readlines()
+
+    times = dict()
+    for line in log:
+        people = list()
+        match = re.search(r"\d\d:\d\d", line)
+        if match:
+            time = match[0]
+        else:
+            match = re.search(r"(in:|out:)", line)
+            if match:
+                people = [p.strip() for p in line[match.end() :].split(",")]
+        for person in people:
+            times.setdefault(person, list()).append(time)
+
+    return times
+
+
+def filter_payment(population: List[PopulationEntry], log_path: str):
     filtered = list()
     PAYMENT = 79
 
     def compute_possible_payments(times: List[int]) -> Set[int]:
-        payments = [0]
-        for r in range(1, len(times) + 1):
+        payments = list()
+        for r in range(len(times) + 1):
             payments += [sum(x) for x in combinations(times, r)]
-
         return set(payments)
 
-    # people_visits = build_list_of_visited_places(population, log)
-    # with open("visits.pkl", "wb") as f:
-    #    pickle.dump(people_visits, f)
-
-    with open("visits.pkl", "rb") as f:
-        people_visits = pickle.load(f)
-
+    in_out = get_in_out_times(log_path)
     for person in population:
-        times = compute_times(people_visits[person])
+        times = compute_times(in_out[person.username])
         possible_payments = compute_possible_payments(times)
-        if PAYMENT in set(possible_payments):
-            print(set(possible_payments))
+        if PAYMENT in possible_payments:
             filtered.append(person)
 
     return filtered
 
+
+# --------------------------------------------------------------------------------------------------
 
 if __name__ == "__main__":
     base_path = Path(__file__).parent
@@ -203,8 +202,7 @@ if __name__ == "__main__":
     filtered_suspects.append(filtered)
 
     # puzzle 3
-    security_log = read_security_log("episode1/security_log.txt")
-    filtered = filter_payment(population, security_log)
+    filtered = filter_payment(population, "episode1/security_log.txt")
     sum_ids = reduce(lambda x, y: x + y.user_id, filtered, 0)
     print(f"Solution for puzzle 3: {sum_ids}")
     filtered_suspects.append(filtered)
