@@ -1,0 +1,12 @@
+Bio-Lab           : 21
+Factory           : 18
+Shopping Mall     : 17
+Food Plant        : 20
+Office Station    : 20
+Gym               :  7
+Starship Garage   : 16
+Happy-Center      : 27
+Palace            : 37
+Junkyard          : 16
+Pod Racing Track  : 19
+Mining Outpost    : 15
