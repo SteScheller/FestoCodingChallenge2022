@@ -1,3 +1,4 @@
+import copy
 from typing import List, Set, Tuple, Iterable
 from pathlib import Path
 from functools import reduce
@@ -57,6 +58,7 @@ def filter_pico_gen3(entries: List[PopulationEntry]) -> List[PopulationEntry]:
     def outer_dfs(
         sample: List[List[str]],
         size: Tuple[int, int],
+        used: Set[Tuple[int, int]],
         sequences: Iterable[str],
         sequences_index: int,
     ) -> bool:
@@ -65,31 +67,22 @@ def filter_pico_gen3(entries: List[PopulationEntry]) -> List[PopulationEntry]:
         if sequences_index == len(sequences):
             return True
 
-        used = set()
-        for row, col in product(range(size[0]), range(size[1])):
-            found_all = True
-            for sequence in SEQUENCES:
-                found = False
-                for row, col in product(range(size[0]), range(size[1])):
-                    if bend_sequence_dfs(sample, size, used, sequence, 0, row, col):
-                        found = True
-                        break
-                if not found:
-                    found_all = False
-                    break
-            if found_all:
-                filtered.append(p)
-                break
-            else:
-                
-
+        for (n_row, n_col) in product(range(size[0]), range(size[1])):
+            if (n_row, n_col) in used:
+                continue
+            used_old = copy.deepcopy(used)
+            if bend_sequence_dfs(sample, size, used, sequences[sequences_index], 0, n_row, n_col):
+                if outer_dfs(sample, size, used, sequences, sequences_index + 1):
+                    return True
+            used = used_old
         return False
 
     filtered = list()
     for idx, p in enumerate(entries):
         sample = p.blood_sample.splitlines()
         size = (len(sample), len(sample[0]))
-        if outer_dfs(sample, size, SEQUENCES, 0):
+        used = set()
+        if outer_dfs(sample, size, used, SEQUENCES, 0):
             filtered.append(p)
 
     return filtered
@@ -108,7 +101,7 @@ if __name__ == "__main__":
     print(f"Bots found in gen3 samples: {len(filtered)}")
 
     population = read_population("episode1/population.txt")
-    filtered = filter_pico_gen3(population)
+    # filtered = filter_pico_gen3(population)
     sum_ids = reduce(lambda x, y: x + y.user_id, filtered, 0)
     print(f"Solution for puzzle 1: {sum_ids}")
     filtered_suspects.append(filtered)
