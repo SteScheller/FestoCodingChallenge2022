@@ -9,6 +9,7 @@ import networkx as nx
 
 from episode1.episode1 import PopulationEntry, read_population, read_lab
 from episode1.episode1 import GalaxyEntry, read_galaxy
+from episode1.episode1 import VisitEntry, build_list_of_visited_places, read_security_log
 
 
 def filter_pico_gen3(entries: List[PopulationEntry]) -> List[PopulationEntry]:
@@ -162,6 +163,53 @@ def filter_signal_delay(
 
 
 # --------------------------------------------------------------------------------------------------
+def read_travel_times(path: Path) -> Dict[str, int]:
+    with open(path, "r") as f:
+        lines = f.readlines()
+
+    times = dict()
+    for entry in lines:
+        facility, time = entry.split(":")
+        times[facility.strip()] = int(time.strip())
+
+    return times
+
+
+def filter_times(
+    population: List[PopulationEntry],
+    visits: Dict[PopulationEntry, List[VisitEntry]],
+    travel_times: Dict[str, int],
+) -> List[PopulationEntry]:
+    filtered = list()
+
+    def check_leave_back_time(
+        leave_entry: VisitEntry,
+        back_entry: VisitEntry,
+    ) -> bool:
+        if leave_entry.goes_in or not back_entry.goes_in:
+            assert False
+        h_leave, m_leave = [int(x) for x in leave_entry.time.split(":")]
+        h_back, m_back = [int(x) for x in back_entry.time.split(":")]
+        t_leave = h_leave * 60 + m_leave
+        t_back = h_back * 60 + m_back
+        latest_leave = 13 * 60 - 20 - travel_times[leave_entry.place]
+        earliest_back = 11 * 60 + 20 + travel_times[back_entry.place]
+        return (t_leave <= latest_leave) and (t_back >= earliest_back)
+
+    # TODO: false positive for Habiba Duarte
+    for p in population:
+        p_visits = visits[p]
+        for i in range(1, len(p_visits) - 2, 2):
+            if check_leave_back_time(p_visits[i], p_visits[i + 1]):
+                filtered.append(p)
+                break
+            else:
+                continue
+
+    return filtered
+
+
+# --------------------------------------------------------------------------------------------------
 
 if __name__ == "__main__":
     base_path = Path(__file__).parent
@@ -174,7 +222,7 @@ if __name__ == "__main__":
     print(f"Bots found in gen3 samples: {len(filtered)}")
 
     population = read_population("episode1/population.txt")
-    filtered = filter_pico_gen3(population)
+    # filtered = filter_pico_gen3(population)
     sum_ids = reduce(lambda x, y: x + y.user_id, filtered, 0)
     print(f"Solution for puzzle 1: {sum_ids}")
     filtered_suspects.append(filtered)
@@ -193,6 +241,13 @@ if __name__ == "__main__":
     filtered_suspects.append(filtered)
 
     # puzzle 3
+    travel_times = read_travel_times(base_path / "travel_times.txt")
+    log = read_security_log("episode1/security_log.txt")
+    visits = build_list_of_visited_places(population, log)
+    filtered = filter_times(population, visits, travel_times)
+    sum_ids = reduce(lambda x, y: x + y.user_id, filtered, 0)
+    print(f"Solution for puzzle 3: {sum_ids}")
+    filtered_suspects.append(filtered)
 
     # list of suspects
     suspects = set(filtered_suspects[0])
