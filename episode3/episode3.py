@@ -1,10 +1,14 @@
 from copy import copy
-from typing import List, Set, Tuple, Iterable
+from typing import List, Set, Tuple, Iterable, Dict, FrozenSet
 from pathlib import Path
 from functools import reduce
-from itertools import product
+from itertools import product, combinations
+
+import numpy as np
+import networkx as nx
 
 from episode1.episode1 import PopulationEntry, read_population, read_lab
+from episode1.episode1 import GalaxyEntry, read_galaxy
 
 
 def filter_pico_gen3(entries: List[PopulationEntry]) -> List[PopulationEntry]:
@@ -94,6 +98,52 @@ def filter_pico_gen3(entries: List[PopulationEntry]) -> List[PopulationEntry]:
 
 
 # --------------------------------------------------------------------------------------------------
+def read_signal_examples(path: Path) -> Dict[FrozenSet[str], int]:
+    with open(path, "r") as f:
+        lines = f.readlines()
+
+    distances = dict()
+    for entry in lines:
+        planets, distance = entry.split(":")
+        planets = frozenset([x.strip() for x in planets.split("-")])
+        distances[planets] = int(distance.strip())
+
+    return distances
+
+
+def compute_delay_graph(galaxy: List[GalaxyEntry]) -> nx.Graph:
+    MAX_DISTANCE = 50
+    graph = nx.Graph()
+    for planet in galaxy:
+        graph.add_node(planet.planet, coordinates=planet.coordinates)
+
+    for p1, p2 in combinations(galaxy, 2):
+        if np.linalg.norm(p1.coordinates - p2.coordinates) <= MAX_DISTANCE:
+            graph.add_edge(p1.planet, p2.planet, delay=1)
+
+    return graph
+
+
+def test_delay_graph(delay_graph: nx.Graph, example_distances: Dict[FrozenSet[str], int]) -> bool:
+    result = True
+    for planets, distance in example_distances.items():
+        p1, p2 = planets
+        computed_distance = nx.shortest_path_length(delay_graph, p1, p2)
+        if distance != computed_distance:
+            result = False
+            break
+
+    return result
+
+
+def filter_signal_delay(
+    population: List[PopulationEntry], delay_graph: nx.Graph, delays: Dict[str, int]
+) -> List[PopulationEntry]:
+    filtered = list()
+    return filtered
+
+
+# --------------------------------------------------------------------------------------------------
 
 if __name__ == "__main__":
     base_path = Path(__file__).parent
@@ -106,12 +156,21 @@ if __name__ == "__main__":
     print(f"Bots found in gen3 samples: {len(filtered)}")
 
     population = read_population("episode1/population.txt")
-    filtered = filter_pico_gen3(population)
+    # filtered = filter_pico_gen3(population)
     sum_ids = reduce(lambda x, y: x + y.user_id, filtered, 0)
     print(f"Solution for puzzle 1: {sum_ids}")
     filtered_suspects.append(filtered)
 
     # puzzle 2
+    galaxy = read_galaxy("episode1/galaxy_map.txt")
+    examples = read_signal_examples(base_path / "signal_examples.txt")
+    delay_graph = compute_delay_graph(galaxy)
+    test_result = "PASS" if test_delay_graph(delay_graph, examples) else "FAIL"
+    print(f"Test of delay graph: {test_result}")
+    filtered = filter_signal_delay(population, delay_graph, {"Venis": 2, "Cetung": 4, "Phoensa": 9})
+    sum_ids = reduce(lambda x, y: x + y.user_id, filtered, 0)
+    print(f"Solution for puzzle 2: {sum_ids}")
+    filtered_suspects.append(filtered)
 
     # puzzle 3
 
