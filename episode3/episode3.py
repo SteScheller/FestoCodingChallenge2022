@@ -1,4 +1,4 @@
-import copy
+from copy import copy
 from typing import List, Set, Tuple, Iterable
 from pathlib import Path
 from functools import reduce
@@ -24,65 +24,70 @@ def filter_pico_gen3(entries: List[PopulationEntry]) -> List[PopulationEntry]:
 
         return coords
 
-    def bend_sequence_dfs(
+    def find_single_sequence(
         sample: List[List[str]],
         size: Tuple[int, int],
         used: Set[Tuple[int, int]],
+        path: List[Tuple[int, int]],
+        solutions: List[List[Tuple[int, int]]],
         sequence: str,
-        sequence_index: int,
+        index: int,
         row: int,
         col: int,
-    ) -> bool:
+    ) -> None:
         """Depth first search for bend sequence of characters in two dimensional array"""
-        if sequence_index == len(sequence):
-            return True
+        if index == len(sequence):
+            solutions.append(copy(path))
+            return
 
-        if sequence_index == 0:
-            neighborhood = {(row, col)}
+        if index == 0:
+            search_space = {(row, col)}
         else:
-            neighborhood = get_neighborhood(size, row, col)
-        for (n_row, n_col) in neighborhood:
-            if (n_row, n_col) in used:
+            search_space = get_neighborhood(size, row, col)
+        for (n_row, n_col) in search_space:
+            if (n_row, n_col) in used | set(path):
                 continue
-            if sample[n_row][n_col] == sequence[sequence_index]:
-                used.add((n_row, n_col))
-                if bend_sequence_dfs(
-                    sample, size, used, sequence, sequence_index + 1, n_row, n_col
-                ):
-                    return True
-                else:
-                    used.remove((n_row, n_col))
+            if sample[n_row][n_col] == sequence[index]:
+                path.append((n_row, n_col))
+                find_single_sequence(
+                    sample, size, used, path, solutions, sequence, index + 1, n_row, n_col
+                )
+                path.pop()
 
-        return False
-
-    def outer_dfs(
+    def find_all_sequences(
         sample: List[List[str]],
         size: Tuple[int, int],
         used: Set[Tuple[int, int]],
         sequences: Iterable[str],
-        sequences_index: int,
+        index: int,
     ) -> bool:
-        """Depth first search for sequence of bend sequences of characters in two
-        dimensional array without overlap"""
-        if sequences_index == len(sequences):
+        """Depth first search for multiple bend sequences of characters in two dimensional array
+        without overlap"""
+        if index == len(sequences):
             return True
 
+        used_old = copy(used)
         for (n_row, n_col) in product(range(size[0]), range(size[1])):
             if (n_row, n_col) in used:
                 continue
-            used_old = copy.deepcopy(used)
-            if bend_sequence_dfs(sample, size, used, sequences[sequences_index], 0, n_row, n_col):
-                if outer_dfs(sample, size, used, sequences, sequences_index + 1):
+            path, solutions = list(), list()
+            find_single_sequence(
+                sample, size, used_old, path, solutions, sequences[index], 0, n_row, n_col
+            )
+            for solution in solutions:
+                used = used_old | set(solution)
+                if find_all_sequences(sample, size, used, sequences, index + 1):
                     return True
-            used = used_old
+                else:
+                    used = used_old
         return False
 
     filtered = list()
-    for idx, p in enumerate(entries):
+    for p in entries:
         sample = p.blood_sample.splitlines()
         size = (len(sample), len(sample[0]))
         used = set()
-        if outer_dfs(sample, size, used, SEQUENCES, 0):
+        if find_all_sequences(sample, size, used, SEQUENCES, 0):
             filtered.append(p)
 
     return filtered
@@ -95,13 +100,13 @@ if __name__ == "__main__":
     filtered_suspects = list()
 
     # puzzle 1
-    # filtered = filter_pico_gen3(read_lab("episode1/lab_blood_clean.txt"))
-    # print(f"Bots found in clean samples: {len(filtered)}")
+    filtered = filter_pico_gen3(read_lab("episode1/lab_blood_clean.txt"))
+    print(f"Bots found in clean samples: {len(filtered)}")
     filtered = filter_pico_gen3(read_lab(base_path / "lab_blood_gen3.txt"))
     print(f"Bots found in gen3 samples: {len(filtered)}")
 
     population = read_population("episode1/population.txt")
-    # filtered = filter_pico_gen3(population)
+    filtered = filter_pico_gen3(population)
     sum_ids = reduce(lambda x, y: x + y.user_id, filtered, 0)
     print(f"Solution for puzzle 1: {sum_ids}")
     filtered_suspects.append(filtered)
