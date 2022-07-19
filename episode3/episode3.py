@@ -137,10 +137,28 @@ def test_delay_graph(delay_graph: nx.Graph, example_distances: Dict[FrozenSet[st
 
 
 def filter_signal_delay(
-    population: List[PopulationEntry], delay_graph: nx.Graph, delays: Dict[str, int]
+    population: List[PopulationEntry],
+    galaxy: List[GalaxyEntry],
+    delay_graph: nx.Graph,
+    delays: Dict[str, int],
 ) -> List[PopulationEntry]:
-    filtered = list()
-    return filtered
+    filtered_planets = set()
+
+    for planet in galaxy:
+        match = True
+        for other_planet, distance in delays.items():
+            if not nx.has_path(delay_graph, planet.planet, other_planet):
+                match = False
+                break
+            elif distance != nx.shortest_path_length(delay_graph, planet.planet, other_planet):
+                match = False
+                break
+        if match:
+            filtered_planets.add(planet.planet)
+
+    filtered_people = [p for p in population if p.home_planet in filtered_planets]
+
+    return filtered_people
 
 
 # --------------------------------------------------------------------------------------------------
@@ -156,7 +174,7 @@ if __name__ == "__main__":
     print(f"Bots found in gen3 samples: {len(filtered)}")
 
     population = read_population("episode1/population.txt")
-    # filtered = filter_pico_gen3(population)
+    filtered = filter_pico_gen3(population)
     sum_ids = reduce(lambda x, y: x + y.user_id, filtered, 0)
     print(f"Solution for puzzle 1: {sum_ids}")
     filtered_suspects.append(filtered)
@@ -167,7 +185,9 @@ if __name__ == "__main__":
     delay_graph = compute_delay_graph(galaxy)
     test_result = "PASS" if test_delay_graph(delay_graph, examples) else "FAIL"
     print(f"Test of delay graph: {test_result}")
-    filtered = filter_signal_delay(population, delay_graph, {"Venis": 2, "Cetung": 4, "Phoensa": 9})
+    filtered = filter_signal_delay(
+        population, galaxy, delay_graph, {"Venis": 2, "Cetung": 4, "Phoensa": 9}
+    )
     sum_ids = reduce(lambda x, y: x + y.user_id, filtered, 0)
     print(f"Solution for puzzle 2: {sum_ids}")
     filtered_suspects.append(filtered)
