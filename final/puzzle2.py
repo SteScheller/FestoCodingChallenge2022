@@ -8,10 +8,8 @@ def find_max_booty(path: Path) -> Tuple[str, int]:
     with open(path, "r") as f:
         content = f.read()
 
-    booty_texts = content.split("\n\n")
-
     max_booty_planet, max_booty = "Magrathea", 0
-    for booty_text in booty_texts:
+    for booty_text in content.split("\n\n"):
         lines = booty_text.splitlines()
         if len(lines) < 3:
             continue
