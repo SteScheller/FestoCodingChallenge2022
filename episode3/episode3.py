@@ -187,16 +187,19 @@ def filter_times(
         back_entry: VisitEntry,
     ) -> bool:
         if leave_entry.goes_in or not back_entry.goes_in:
-            assert False
+            return False
         h_leave, m_leave = [int(x) for x in leave_entry.time.split(":")]
         h_back, m_back = [int(x) for x in back_entry.time.split(":")]
         t_leave = h_leave * 60 + m_leave
         t_back = h_back * 60 + m_back
         latest_leave = 13 * 60 - 20 - travel_times[leave_entry.place]
-        earliest_back = 11 * 60 + 20 + travel_times[back_entry.place]
+        earliest_back = (
+            max(11 * 60, t_leave + travel_times[leave_entry.place])
+            + 20
+            + travel_times[back_entry.place]
+        )
         return (t_leave <= latest_leave) and (t_back >= earliest_back)
 
-    # TODO: false positive for Habiba Duarte
     for p in population:
         p_visits = visits[p]
         for i in range(1, len(p_visits) - 2, 2):
@@ -222,7 +225,7 @@ if __name__ == "__main__":
     print(f"Bots found in gen3 samples: {len(filtered)}")
 
     population = read_population("episode1/population.txt")
-    # filtered = filter_pico_gen3(population)
+    filtered = filter_pico_gen3(population)
     sum_ids = reduce(lambda x, y: x + y.user_id, filtered, 0)
     print(f"Solution for puzzle 1: {sum_ids}")
     filtered_suspects.append(filtered)
